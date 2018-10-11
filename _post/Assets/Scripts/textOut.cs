@@ -23,6 +23,7 @@ public class textOut : MonoBehaviour {
 	}
 
 	public IEnumerator POST () {
+		Debug.Log ("Post");
 		var Data = new WWWForm ();
 		Data.AddField ("action", "check");
 		Data.AddField ("deviceName", "north_entrance");
@@ -37,13 +38,15 @@ public class textOut : MonoBehaviour {
 				Debug.Log ("Server responded correctly");
 			} else {
 				Debug.Log ("Server responded : " + Query.text);
-
+				JSONNode jsonNode = SimpleJSON.JSON.Parse (Query.text);
+				_Text.text = jsonNode["country"].ToString ().ToUpper ();
 			}
 		}
 		Query.Dispose ();
 	}
 
 	public IEnumerator GET () {
+		Debug.Log ("Get");
 		//string data1 = "Текст 1";
 		//string data2 = "Текст 2";
 		WWW Query = new WWW (_url); //+ data1 + "&variable2=" + data2);
@@ -63,6 +66,7 @@ public class textOut : MonoBehaviour {
 	}
 
 	IEnumerator _UnityWebRequest () {
+		Debug.Log ("_UnityWebRequest");
 		using (UnityWebRequest www = UnityWebRequest.Get (_url)) {
 			yield return www.SendWebRequest ();
 
