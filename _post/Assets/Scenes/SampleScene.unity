@@ -122,8 +122,9 @@ GameObject:
   m_Component:
   - component: {fileID: 48103183}
   - component: {fileID: 48103182}
+  - component: {fileID: 48103184}
   m_Layer: 0
-  m_Name: TextManager
+  m_Name: WebRequest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -135,12 +136,13 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 48103181}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8ca46bc58de787441889d8171aed2fdc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _Text: {fileID: 1351046386}
+  _url: http://192.168.0.1/index.html
 --- !u!4 &48103183
 Transform:
   m_ObjectHideFlags: 0
@@ -154,6 +156,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &48103184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 48103181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6682b19da20f26e4fb53e510852f26e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _url: http://192.168.0.1/index.html
 --- !u!1 &170076733
 GameObject:
   m_ObjectHideFlags: 0

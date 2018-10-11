@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class textOut : MonoBehaviour {
 
 	public Text _Text;
+	public string _url;
 
 	void Start () {
 		//StartCoroutine(Upload());
@@ -18,16 +19,16 @@ public class textOut : MonoBehaviour {
 	}
 
 	public IEnumerator POST () {
-		Debug.Log("Post_");
 		var Data = new WWWForm ();
-		Data.AddField ("«action»:", "check");
-		Data.AddField ("«deviceName»:", "north_entrance");
-		Data.AddField ("barcode", "1234560000123");
+		Data.AddField ("action", "check");
+		Data.AddField ("deviceName", "north_entrance");
+		Data.AddField ("param1", "param1value");
 
-		var Query = new WWW ("vk.com", Data);
+		var Query = new WWW (_url, Data);
 		yield return Query;
 		if (Query.error != null) {
 			Debug.Log ("Server does not respond : " + Query.error);
+			StartCoroutine (GET ());
 		} else {
 			if (Query.text == "Testss") {//ответ сервера
 				Debug.Log ("Server responded correctly");
@@ -39,10 +40,9 @@ public class textOut : MonoBehaviour {
 	}
 
 	public IEnumerator GET () {
-		Debug.Log("_GET");
-		string data1 = "Текст 1";
-		string data2 = "Текст 2";
-		WWW Query = new WWW ("vk.com"); //+ data1 + "&variable2=" + data2);
+		//string data1 = "Текст 1";
+		//string data2 = "Текст 2";
+		WWW Query = new WWW (_url); //+ data1 + "&variable2=" + data2);
 		yield return Query;
 		if (Query.error != null) {
 			Debug.Log ("Server does not respond : " + Query.error);
