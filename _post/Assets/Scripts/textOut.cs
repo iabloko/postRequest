@@ -25,7 +25,7 @@ public class textOut : MonoBehaviour {
 			StartCoroutine (GET ());
 		if (Input.GetKeyUp (KeyCode.W))
 			StartCoroutine (_UnityWebRequest ());
-		if (Input.GetKeyUp (KeyCode.Tab))
+		if (Input.GetKeyUp (KeyCode.Escape) || Input.GetKeyUp (KeyCode.Tab))
 			_MenuActive (_IPOBJ);
 	}
 
@@ -99,7 +99,7 @@ public class textOut : MonoBehaviour {
 	}
 
 	public void SaveChange () {
-		InputField _IFfield = _IPOBJ.GetComponent<InputField> () as InputField;
+		InputField _IFfield = _IPOBJ.GetComponentInChildren<InputField> () as InputField;
 		_url = _IFfield.text;
 
 		PlayerPrefs.SetString ("_url", _IFfield.text);
