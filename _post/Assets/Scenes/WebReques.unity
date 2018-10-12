@@ -142,7 +142,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _Text: {fileID: 1351046386}
   _IPOBJ: {fileID: 1097619265}
-  _url: 192.200.100.252
+  _url: 192.200.100.252:8080/api/external
   MenuActive: 0
 --- !u!4 &48103183
 Transform:

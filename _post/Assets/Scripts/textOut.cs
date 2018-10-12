@@ -1,108 +1,107 @@
 ﻿using System.Collections;
-using SimpleJSON;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class textOut : MonoBehaviour {
-	private string JsonDataString;
-	public Text _Text;
-	public GameObject _IPOBJ;
-	public string _url;
-	[HideInInspector] public bool MenuActive = false;
+namespace Kulikovskoe {
+	public class textOut : MonoBehaviour {
+		//public MenuAnimator _MenuAnimator;
+		private string JsonDataString;
+		public Toggle _AutoPlay;
+		public Text _Text, _CurrentURL;
+		public GameObject _IPOBJ;
+		public string _url;
 
-	void Awake () {
-		_url = PlayerPrefs.GetString ("_url", _url);
-	}
+		private int _i = 1;
+		public bool _Request = true;
+		[HideInInspector] public bool MenuActive = false;
 
-	void Start () {
-		_IPOBJ.SetActive (false);
-	}
-	void Update () {
-		if (Input.GetKeyUp (KeyCode.Q))
-			StartCoroutine (POST ());
-		if (Input.GetKeyUp (KeyCode.E))
-			StartCoroutine (GET ());
-		if (Input.GetKeyUp (KeyCode.W))
-			StartCoroutine (_UnityWebRequest ());
-		if (Input.GetKeyUp (KeyCode.Escape) || Input.GetKeyUp (KeyCode.Tab))
-			_MenuActive (_IPOBJ);
-	}
+		//
 
-	public IEnumerator POST () {
-		_Text.text = "Post";
-		var Data = new WWWForm ();
-		Data.AddField ("action", "check");
-		Data.AddField ("deviceName", "north_entrance");
-		Data.AddField ("param1", "param1value");
-		var Query = new WWW (_url, Data);
-		yield return Query;
-
-		if (Query.error != null) {
-			Debug.Log ("Server does not respond : " + Query.error);
-		} else {
-			if (Query.text == "Testss") { //ответ сервера
-				Debug.Log ("Server responded correctly");
-			} else {
-				Debug.Log ("Server responded : " + Query.text);
-				JSONNode jsonNode = SimpleJSON.JSON.Parse (Query.text);
-				_Text.text = jsonNode["country"].ToString ().ToUpper ();
-			}
-		}
-		Query.Dispose ();
-	}
-
-	public IEnumerator GET () {
-		_Text.text = "GET";
-		//string data1 = "Текст 1";
-		//string data2 = "Текст 2";
-		WWW Query = new WWW (_url); //+ data1 + "&variable2=" + data2);
-		yield return Query;
-
-		if (Query.error != null) {
-			Debug.Log ("Server does not respond : " + Query.error);
-		} else {
-			if (Query.text == "Test") {
-				Debug.Log ("Server responded correctly");
-			} else {
-				Debug.Log ("Server responded : " + Query.text);
-				JSONNode jsonNode = SimpleJSON.JSON.Parse (Query.text);
-				_Text.text = jsonNode["country"].ToString ().ToUpper ();
-			}
-		}
-		Query.Dispose ();
-	}
-
-	IEnumerator _UnityWebRequest () {
-		_Text.text = "_UnityWebRequest";
-		using (UnityWebRequest www = UnityWebRequest.Get (_url)) {
-			yield return www.SendWebRequest ();
-
-			if (www.isNetworkError || www.isHttpError) {
-				Debug.Log (www.error);
-			} else {
-				//_Text.text = www.downloadHandler.text;
-				byte[] results = www.downloadHandler.data;
-				JSONNode jsonNode = SimpleJSON.JSON.Parse (www.downloadHandler.text);
-				_Text.text = jsonNode["country"].ToString ().ToUpper ();
-			}
-			www.Dispose ();
-		}
-	}
-
-	private void _MenuActive (GameObject _InputField) {
-
-		if (_InputField.activeInHierarchy == false)
-			_IPOBJ.SetActive (true);
-		else
+		void Awake () {
+			LoadChanges ();
 			_IPOBJ.SetActive (false);
-	}
+		}
 
-	public void SaveChange () {
-		InputField _IFfield = _IPOBJ.GetComponentInChildren<InputField> () as InputField;
-		_url = _IFfield.text;
+		void Start () {
 
-		PlayerPrefs.SetString ("_url", _IFfield.text);
-		Debug.Log ("IPField.text" + "              " + _url);
+		}
+
+		void Update () {
+			if (Input.GetKeyUp (KeyCode.Q)) {
+				StartCoroutine (POST ());
+			}
+
+			if (Input.GetKeyUp (KeyCode.Escape) || Input.GetKeyUp (KeyCode.Tab)) {
+				_MenuActive (_IPOBJ);
+			}
+
+			if ((_i % 301 == 0) && _AutoPlay.isOn == false && _Request == true) {
+				_i = 1;
+				_Request = false;
+				StartCoroutine (POST ());
+			} else if (_i == 50000) {
+				_i = 1;
+			}
+			_i++;
+		}
+
+		public IEnumerator POST () {
+			_i = 1;
+			var Data = new WWWForm ();
+			Data.AddField ("action", "check");
+			Data.AddField ("deviceName", "north_entrance");
+			var Query = new WWW (_url, Data);
+			yield return Query;
+
+			if (Query.error != null) {
+				Debug.Log ("Server does not respond : " + Query.error);
+				_Text.text = Query.error;
+				_Request = true;
+			} else {
+				if (Query.text == "Testss") { //ответ сервера
+					Debug.Log ("Server responded correctly");
+					_Request = true;
+				} else {
+					Debug.Log ("Server responded : " + Query.text);
+					_Text.text = Query.text;
+					JSONNode jsonNode = Kulikovskoe.JSON.Parse (Query.text);
+					_Text.text = jsonNode["success"].ToString ().ToUpper ();
+					if (_Text.text == "true") {
+						//_MenuAnimator.SA ();
+					} else {
+						_Request = true;
+					}
+				}
+			}
+			Query.Dispose ();
+		}
+
+		private void _MenuActive (GameObject _InputField) {
+
+			if (_InputField.activeInHierarchy == false)
+				_IPOBJ.SetActive (true);
+			else
+				_IPOBJ.SetActive (false);
+		}
+
+		public void SaveChange () {
+			InputField _IFfield = _IPOBJ.GetComponentInChildren<InputField> () as InputField;
+			//_url =_IFfield.text;
+
+			PlayerPrefs.SetString ("_CurrentURL", _url);
+			PlayerPrefs.SetInt ("_AutoPlay.isOn", _AutoPlay.isOn?1 : 0);
+			PlayerPrefs.SetString ("_url", "http://"+_IFfield.text);
+			SceneManager.LoadScene ("Kulikovskoe360-1");
+		}
+		private void LoadChanges () {
+			_Request = true;
+
+			_CurrentURL.text = "CurrentURL:" + PlayerPrefs.GetString ("_CurrentURL", _CurrentURL.text);
+			_AutoPlay.isOn = PlayerPrefs.GetInt ("_AutoPlay.isOn") == 1 ? true : false;
+			_url = PlayerPrefs.GetString ("_url", "http://"+_url);
+		}
+
 	}
 }

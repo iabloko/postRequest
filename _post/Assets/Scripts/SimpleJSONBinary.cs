@@ -37,7 +37,7 @@
  * * * * */
 using System;
 
-namespace SimpleJSON
+namespace Kulikovskoe
 {
 #if !SimpleJSON_ExcludeBinary
     public abstract partial class JSONNode
