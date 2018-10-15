@@ -32,6 +32,7 @@ namespace Kulikovskoe {
 
 			if (_elapsed >= 1.2f && _AutoPlay.isOn == false && _Request == true) {
 				if (!Uri.TryCreate (_url, UriKind.Absolute, out _uri)) {
+					_elapsed = 0;
 					_Text.text = "Invalid URL. Example: 192.200.100.252:8088/api/external, or vk.com";
 				} else {
 					_Request = false;
@@ -39,10 +40,9 @@ namespace Kulikovskoe {
 					_elapsed = 0;
 					StartCoroutine (POST ());
 				}
-			} else if (_elapsed >= 5)
+			} else if (_elapsed >= 1.2f)
 				_elapsed = 0;
 			_elapsed += Time.deltaTime;
-
 		}
 
 		public IEnumerator POST () {
@@ -61,6 +61,8 @@ namespace Kulikovskoe {
 				_Text.text = jsonNode["success"].ToString ().ToUpper ();
 				if (_Text.text == "true") {
 					//_MenuAnimator._StartAnimation ();
+				} else {
+					_Request = true;
 				}
 			}
 			Query.Dispose ();
