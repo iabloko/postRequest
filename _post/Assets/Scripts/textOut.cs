@@ -8,18 +8,16 @@ using UnityEngine.UI;
 namespace Kulikovskoe {
 	public class textOut : MonoBehaviour {
 		//public MenuAnimator _MenuAnimator;
+		public InputString _inputString;
 		private string JsonDataString;
-		public string _barcode;
 		public Toggle _AutoPlay;
-		public Text _StatusText, _CurrentURL, StatusText_2;
+		public Text _StatusText, _CurrentURL;
 		public GameObject _IPOBJ;
 		private string _url;
 		private Uri _uri;
 
-		private Text _SucessText, checkResultText;
 		//private bool _setActive = false;
 		[HideInInspector] public bool _Request = true;
-		private float _elapsed;
 
 		void Awake () {
 			LoadChanges ();
@@ -31,27 +29,26 @@ namespace Kulikovskoe {
 			if (Input.GetKeyUp (KeyCode.Escape) || Input.GetKeyUp (KeyCode.Tab)) {
 				_MenuActive (_IPOBJ);
 			}
+		}
 
-			if (_elapsed >= 1.2f && _AutoPlay.isOn == false && _Request == true) {
+		public void Start_Post () {
+			if (_AutoPlay.isOn == false && _Request == true) {
 				if (!Uri.TryCreate (_url, UriKind.Absolute, out _uri)) {
-					_elapsed = 0;
+					Debug.Log ("PIZDA");
 					_StatusText.text = "Invalid URL. Example: 192.200.100.252:8088/api/external, or vk.com";
 				} else {
 					_Request = false;
 					_StatusText.text = "Connect";
-					_elapsed = 0;
 					StartCoroutine (POST ());
 				}
-			} else if (_elapsed >= 1.2f)
-				_elapsed = 0;
-			_elapsed += Time.deltaTime;
+			}
 		}
 
 		public IEnumerator POST () {
 			var Data = new WWWForm ();
 			Data.AddField ("action", "check");
 			Data.AddField ("deviceName", "north_entrance");
-			Data.AddField ("barcode", _barcode);
+			Data.AddField ("barcode", _inputString._BarcodeSave.text);
 
 			var Query = new WWW (_url, Data);
 			yield return Query;
@@ -62,14 +59,9 @@ namespace Kulikovskoe {
 			} else {
 				_StatusText.text = "Server responded : " + Query.text;
 				JSONNode jsonNode = Kulikovskoe.JSON.Parse (Query.text);
-				_StatusText.text = jsonNode["success"].ToString ().ToUpper ();
+				_StatusText.text = "success= " + jsonNode["success"].ToString ().ToUpper () + " checkResult= " + jsonNode["checkResult"].ToString ().ToUpper ();
 
-				_SucessText.text = jsonNode["success"].ToString ().ToUpper ();
-				checkResultText.text = jsonNode["checkResult"].ToString ().ToUpper ();
-
-				StatusText_2.text = _SucessText.text + "      " + checkResultText.text;
-
-				if (_SucessText.text == "true") {
+				if (_StatusText.text == "true") {
 					//_MenuAnimator._StartAnimation ();
 				} else {
 					_Request = true;
