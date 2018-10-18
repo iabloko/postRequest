@@ -11,15 +11,14 @@ namespace Kulikovskoe {
 		public InputString _inputString;
 		private string JsonDataString;
 		public Toggle _AutoPlay;
-		public Text _StatusText, _CurrentURL;
+		public Text _StatusText, _StatusText2, _SuccesText, _passAllowedText, _entryAllowedText, _CurrentURL;
 		public GameObject _IPOBJ;
 		private string _url;
 		private Uri _uri;
-
-		//private bool _setActive = false;
 		[HideInInspector] public bool _Request = true;
 
 		void Awake () {
+
 			LoadChanges ();
 			_IPOBJ.SetActive (false);
 			_CurrentURL.text = " CurrentURL: " + _url;
@@ -34,7 +33,6 @@ namespace Kulikovskoe {
 		public void Start_Post () {
 			if (_AutoPlay.isOn == false && _Request == true) {
 				if (!Uri.TryCreate (_url, UriKind.Absolute, out _uri)) {
-					Debug.Log ("PIZDA");
 					_StatusText.text = "Invalid URL. Example: 192.200.100.252:8088/api/external, or vk.com";
 				} else {
 					_Request = false;
@@ -61,8 +59,14 @@ namespace Kulikovskoe {
 				JSONNode jsonNode = Kulikovskoe.JSON.Parse (Query.text);
 				_StatusText.text = "success= " + jsonNode["success"].ToString ().ToUpper () + " checkResult= " + jsonNode["checkResult"].ToString ().ToUpper ();
 
-				if (_StatusText.text == "true") {
-					//_MenuAnimator._StartAnimation ();
+				_SuccesText.text = jsonNode["success"].ToString ().ToUpper ();
+				_passAllowedText.text = jsonNode["checkResult"]["passAllowed"].ToString ().ToUpper ();
+				_entryAllowedText.text = jsonNode["checkResult"]["entryAllowed"].ToString ().ToUpper ();
+
+				_StatusText2.text = _SuccesText.text + _passAllowedText.text + _entryAllowedText.text;
+				//entryAllowed //exitAllowed //passAllowed
+				if (_StatusText2.text=="TRUETRUETRUE") {
+					_StatusText2.text = "StartAnimation";
 				} else {
 					_Request = true;
 				}
